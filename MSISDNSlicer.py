@@ -1,25 +1,31 @@
+# Import necessary libraries
 from tkinter import filedialog
 import tkinter as tk
 import configparser
 import math
 import os
 
+# Create a configuration object and read configuration from 'config.ini' file
 config = configparser.ConfigParser()
-config.read('config.txt')
+config.read('config.ini')
 
-count1 = config.get('General','count1') #100
-count2 = config.get('General','count2') #200
-count3 = config.get('General','count3') #300
-count4 = config.get('General','count4') #400
+# Retrieve configuration values
+count1 = config.get('General','count1') 
+count2 = config.get('General','count2') 
+count3 = config.get('General','count3') 
+count4 = config.get('General','count4') 
 results_path = config.get('General','results_path')
 
+# global variable for file_path
 file_path = ""
 
+# Function to open a file dialog and get the selected file path
 def clear_output():
     output_text.delete("1.0", "end")
     message_entry.delete("1.0", "end")
     Browse_entry.delete("1.0", "end")
 
+# Function to open a file dialog and get the selected file path
 def browse_file_path():
     global file_path
     file_path = filedialog.askopenfilename()
@@ -30,6 +36,7 @@ def browse_file_path():
     Browse_entry.insert("1.0", f"File Name : {file_name}\n")
     Browse_entry.insert("end", f"File Size : {file_size:,.0f} KB\n")
 
+# Function to read the content of the selected file
 def browse_file():
     global file_path
     if os.path.exists(file_path):
@@ -40,23 +47,28 @@ def browse_file():
         file_name = file_name.split('.')[0]
         return content, file_name
 
+# Function to read the message from the input field
 def read_message():
     message = list(message_entry.get("1.0", "end-1c"))
     num_of_char = len(message)
     split_level = math.ceil((num_of_char/70))
     return num_of_char,split_level
 
+# Function to split the content into multiple files
 def split_content(chunk_size,new_list,file_name):
     final_list = list()
     start = 0
     end = chunk_size
 
     data_per_file = len(new_list) / chunk_size
-    num_of_files = math.ceil(data_per_file)  # 5
+    num_of_files = math.ceil(data_per_file)  
 
     num_of_char, split_level = read_message()
 
-    output_text.delete("1.0", "end")  # Clear previous content
+    # Clear previous content in the output_text field
+    output_text.delete("1.0", "end")  
+
+    # Display message information in the output field
     output_text.insert("1.0", f"Message Body = {num_of_char}\n")
     output_text.insert("end", f"Number of Parts = {split_level}\n")
     output_text.insert("end", f"Number of MSISDNs = {len(new_list)}\n")
@@ -70,8 +82,8 @@ def split_content(chunk_size,new_list,file_name):
             with open(path_of_file, 'w') as file:
                 for val in final_list[i]:
                     file.write(val + '\n')
-            start += chunk_size  # 100
-            end += chunk_size  # 200
+            start += chunk_size  
+            end += chunk_size  
 
         elif i == (num_of_files-1):
             final_list.append(new_list[start:])
@@ -79,6 +91,7 @@ def split_content(chunk_size,new_list,file_name):
                 for val in final_list[i]:
                     file.write(val + '\n')
 
+# Function to process and split MSISDNs
 def num_pattern():
     new_list = list()
     content,file_name = browse_file()
@@ -108,25 +121,24 @@ def num_pattern():
         chunk_size = int(count4)
         split_content(chunk_size, new_list,file_name)
 
-# Create the main window
+# Create the main Tkinter window
 root = tk.Tk()
 root.title("File and message Reader")
 
-# Set the background color of the window
-root.configure(bg="light gray")  # Change "light gray" to your desired color
+# Configure the appearance of the main window
+root.configure(bg="light gray")  
 
-# Make the window bigger
 window_width = 700
 window_height = 700
 root.geometry(f"{window_width}x{window_height}")
 
-# Center the window on the screen
 screen_width = root.winfo_screenwidth()
 screen_height = root.winfo_screenheight()
 x_coordinate = (screen_width - window_width) // 2
 y_coordinate = (screen_height - window_height) // 2
 root.geometry(f"+{x_coordinate}+{y_coordinate}")
 
+# Create and place GUI elements (labels, buttons, text fields) on the main window
 message_label = tk.Label(root, text="Enter message:")
 message_label.pack(pady=(10, 0))
 
@@ -148,7 +160,6 @@ run_label.pack(pady=(30, 0))
 run_button = tk.Button(root, text="RUN", command=num_pattern, borderwidth=1, relief="solid")
 run_button.pack(pady=(5, 0))
 
-#,font=("Helvetica", 14, "bold")
 output_label = tk.Label(root, text="Output:")
 output_label.pack(pady=(35, 0))
 
@@ -158,5 +169,5 @@ output_text.pack(pady=(5, 0))
 clear_button = tk.Button(root, text="Clear", command=clear_output, borderwidth=1, relief="solid")
 clear_button.pack(pady=(40, 0))
 
-# Start the GUI event loop
+# Start the Tkinter main loop
 root.mainloop()
