@@ -1,0 +1,6 @@
+[General]
+count1 = 214000
+count2 = 107000
+count3 = 300000
+count4 = 400000
+results_path = C:\path\of\results\folder
